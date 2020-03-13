@@ -33,7 +33,7 @@ class vehicle:
         self.lvs.append(cluster['l'])
 
     def bin_side_vehs(self,rvs,lvs):
-        cluster={'rl':[0,0,0,0,0],'rr':[0,0,0,0,0],'r':[0,0,0,0,0],'fl':[0,0,0,0,0],'fr':[0,0,0,0,0],'l':[0,0,0,0,0]}
+        cluster={'rl':[0,0,0,0,0,0],'rr':[0,0,0,0,0,0],'r':[0,0,0,0,0,0],'fl':[0,0,0,0,0,0],'fr':[0,0,0,0,0,0],'l':[0,0,0,0,0,0]}
         if self.ls[-1][0]==0:
             self.populate_veh_lists(cluster)
             return
@@ -45,18 +45,18 @@ class vehicle:
             if vs[0]==0:
                 continue
             if veh[1]<lvState[2]+0.16 and veh[1]>lvState[2]-16:
-                cluster['l']=np.append([vs[0]],veh)
+                cluster['l']=np.append([vs[0]],veh,[(vs[3]-lvState[2])/(vs[2]-lvState[1])])
             elif veh[1]<lvState[2]-16:
                 if np.sum(cluster['rl']) == 0:
-                    cluster['rl']=np.append([vs[0]],veh)  
+                    cluster['rl']=np.append([vs[0]],veh,[(vs[3]-lvState[2])/(vs[2]-lvState[1])])  
                 elif cluster['rl'][2]<veh[1]:
-                    cluster['rl']=np.append([vs[0]],veh)
+                    cluster['rl']=np.append([vs[0]],veh,[(vs[3]-lvState[2])/(vs[2]-lvState[1])])
 
             elif veh[1]>lvState[2]+0.16:
                 if np.sum(cluster['fl']) == 0:
-                    cluster['fl']=np.append([vs[0]],veh)
+                    cluster['fl']=np.append([vs[0]],veh,[(vs[3]-lvState[2])/(vs[2]-lvState[1])])
                 elif cluster['fl'][2]>veh[1]:
-                    cluster['fl']=np.append([vs[0]],veh)
+                    cluster['fl']=np.append([vs[0]],veh,[(vs[3]-lvState[2])/(vs[2]-lvState[1])])
 
         # select neighbors in right lane 
         for vs in rvs:
@@ -64,18 +64,18 @@ class vehicle:
                 continue
             veh=vs[1:]-self.states[-1][1:]
             if veh[1]<lvState[2]+0.16 and veh[1]>lvState[2]-16:
-                cluster['r']=np.append([vs[0]],veh)
+                cluster['r']=np.append([vs[0]],veh,[(vs[3]-lvState[2])/(vs[2]-lvState[1])])
             elif veh[1]+16<lvState[2]:
                 if np.sum(cluster['rr'])==0:
-                    cluster['rr']=np.append([vs[0]],veh)
+                    cluster['rr']=np.append([vs[0]],veh,[(vs[3]-lvState[2])/(vs[2]-lvState[1])])
                 elif cluster['rr'][2]<veh[1]:
-                    cluster['rr']=np.append([vs[0]],veh)
+                    cluster['rr']=np.append([vs[0]],veh,[(vs[3]-lvState[2])/(vs[2]-lvState[1])])
 
             elif veh[1]>lvState[2]+0.16:
                 if np.sum(cluster['fr'])==0:
-                    cluster['fr']=np.append([vs[0]],veh)
+                    cluster['fr']=np.append([vs[0]],veh,[(vs[3]-lvState[2])/(vs[2]-lvState[1])])
                 elif cluster['fr'][2]>veh[1]:
-                    cluster['fr']=np.append([vs[0]],veh)
+                    cluster['fr']=np.append([vs[0]],veh,[(vs[3]-lvState[2])/(vs[2]-lvState[1])])
         
         self.populate_veh_lists(cluster)
         # if np.sum(cluster['l']) or np.sum(cluster['r']): 
@@ -132,10 +132,11 @@ for f in files:
                 lvs=dff[dff['Lane_ID']==lane-1][state_feats].to_numpy()
                 rvs=dff[dff['Lane_ID']==lane+1][state_feats].to_numpy()
                 if llvid>0 and lvid>0:
-                    vehicleObjs[str(v)].llvs.append(v_states[str(llvid)]-v_states[str(lvid)]+np.array([lvid,0,0,0,0]))
+                    rel_state=v_states[str(llvid)]-v_states[str(lvid)]+np.array([lvid,0,0,0,0])
+                    vehicleObjs[str(v)].llvs.append(rel_state)
                 elif lvid>0:
                     vehicleObjs[str(v)].llvs.append(v_states[str(llvid)])
-                vehicleObjs[str(v)].ls.append(v_states[str(lvid)])
+                vehicleObjs[str(v)].ls.append(v_states[str(lvid)],np.append([-1*vehicleObjs[str(v)].llvs[-1][3]/vehicleObjs[str(v)].llvs[-1][2]]))
                 vehicleObjs[str(v)].bin_side_vehs(rvs,lvs)
         print('scene processed: '+str(time.time()-st_time2))
     print('saving veh objs')
