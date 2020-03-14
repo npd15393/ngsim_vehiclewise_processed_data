@@ -38,25 +38,25 @@ class vehicle:
             self.populate_veh_lists(cluster)
             return
 
-        lvState=self.ls[-1][1:]-self.states[-1][1:]
+        lvState=self.ls[-1][1:-1]-self.states[-1][1:]
         # select neighbors in left lane 
         for vs in lvs:
             veh=vs[1:]-self.states[-1][1:]
             if vs[0]==0:
                 continue
             if veh[1]<lvState[1]+0.16 and veh[1]>lvState[1]-16:
-                cluster['l']=np.append([vs[0]],veh)
+                cluster['l']=np.append([vs[0]],np.append(veh,[(veh[2]-lvState[2])/(veh[1]-lvState[1])]))
             elif veh[1]<lvState[1]-16:
                 if np.sum(cluster['rl']) == 0:
-                    cluster['rl']=np.append([vs[0]],veh)  
+                    cluster['rl']=np.append([vs[0]],np.append(veh,[(veh[2]-lvState[2])/(veh[1]-lvState[1])]))  
                 elif cluster['rl'][2]<veh[1]:
-                    cluster['rl']=np.append([vs[0]],veh)
+                    cluster['rl']=np.append([vs[0]],np.append(veh,[(veh[2]-lvState[2])/(veh[1]-lvState[1])]))
 
             elif veh[1]>lvState[1]+0.16:
                 if np.sum(cluster['fl']) == 0:
-                    cluster['fl']=np.append([vs[0]],veh)
+                    cluster['fl']=np.append([vs[0]],np.append(veh,[(veh[2]-lvState[2])/(veh[1]-lvState[1])]))
                 elif cluster['fl'][2]>veh[1]:
-                    cluster['fl']=np.append([vs[0]],veh)
+                    cluster['fl']=np.append([vs[0]],np.append(veh,[(veh[2]-lvState[2])/(veh[1]-lvState[1])]))
 
         # select neighbors in right lane 
         for vs in rvs:
@@ -64,18 +64,18 @@ class vehicle:
                 continue
             veh=vs[1:]-self.states[-1][1:]
             if veh[1]<lvState[1]+0.16 and veh[1]>lvState[1]-16:
-                cluster['r']=np.append([vs[0]],veh)
+                cluster['r']=np.append([vs[0]],np.append(veh,[(veh[2]-lvState[2])/(veh[1]-lvState[1])]))
             elif veh[1]<lvState[1]-16:
                 if np.sum(cluster['rr'])==0:
-                    cluster['rr']=np.append([vs[0]],veh)
+                    cluster['rr']=np.append([vs[0]],np.append(veh,[(veh[2]-lvState[2])/(veh[1]-lvState[1])]))
                 elif cluster['rr'][2]<veh[1]:
-                    cluster['rr']=np.append([vs[0]],veh)
+                    cluster['rr']=np.append([vs[0]],np.append(veh,[(veh[2]-lvState[2])/(veh[1]-lvState[1])]))
 
             elif veh[1]>lvState[1]+0.16:
                 if np.sum(cluster['fr'])==0:
-                    cluster['fr']=np.append([vs[0]],veh)
+                    cluster['fr']=np.append([vs[0]],np.append(veh,[(veh[2]-lvState[2])/(veh[1]-lvState[1])]))
                 elif cluster['fr'][2]>veh[1]:
-                    cluster['fr']=np.append([vs[0]],veh)
+                    cluster['fr']=np.append([vs[0]],np.append(veh,[(veh[2]-lvState[2])/(veh[1]-lvState[1])]))
         
         self.populate_veh_lists(cluster)
         # if np.sum(cluster['l']) or np.sum(cluster['r']): 
